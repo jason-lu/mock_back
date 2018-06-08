@@ -67,4 +67,4 @@ typings/
 .serverless
 
 # configuration files
-*.json
+config/*.json
