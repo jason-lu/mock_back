@@ -9,8 +9,17 @@ const saltRounds = 10;
 const salt = secrets.salt;
 var bcrypt = require('bcrypt');
 
+const auth = require('./authentication/auth');
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(require('cookie-parser')());
+app.use(require('express-session')({ secret: salt, resave: false, saveUninitialized: false }));
+
+// Initialize Passport and restore authentication state, if any, from the
+// session.
+app.use(auth.passport.initialize());
+app.use(auth.passport.session());
 
 
 // app.use(express.static('mockfront'));
@@ -33,6 +42,14 @@ app.post('/m2', (req,res) => {
         });
     });
 });
+
+app.post('/m3',
+    auth.passport.authenticate('local'),
+    function(req,res){
+        res.json({m3: 'success'});
+    }
+);
+
 
 app.listen(8082, () => 
 {
