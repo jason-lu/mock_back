@@ -16,7 +16,7 @@ const pool = new Pool({
   });
   
   //请求数据
-  pool.query('SELECT * from replica_test')
+  pool.query('SELECT * from test')
     .then(res => {
       console.log(res.rows[0]);
     })

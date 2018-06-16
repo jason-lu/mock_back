@@ -24,13 +24,21 @@ app.use(auth.passport.session());
 
 // app.use(express.static('mockfront'));
 
-app.get('/', (req, res) => res.sendFile('auth.html', { root : __dirname+'/mockfront'}));
+app.get('/login', (req,res) => {
+    res.sendFile('auth.html', { root : __dirname+'/mockfront'})
+});
+
+
+
+app.get('/', (req, res) => res.sendFile('index.html', { root : __dirname+'/mockfront'}));
 
 app.get('/m1', function (req,res)
 { 
     res.send(req.toString());
 });
+
 app.post('/m2', (req,res) => {
+    console.log(req.body);
     bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash('password', salt, function(err, hash) {
             if(!err) {
@@ -46,7 +54,7 @@ app.post('/m2', (req,res) => {
 app.post('/m3',
     auth.passport.authenticate('local'),
     function(req,res){
-        res.json({m3: 'success'});
+        res.redirect('/');
     }
 );
 
