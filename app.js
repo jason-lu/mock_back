@@ -40,9 +40,10 @@ app.get('/m1', function (req,res)
 app.post('/m2', (req,res) => {
     console.log(req.body);
     bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash('password', salt, function(err, hash) {
+        console.log(req.body.passeord);
+        bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
-                db.addUser('kuan','kuan@exapmle.com',hash);
+                db.addUser(req.body.username,req.body.email,hash);
                 res.json({m2: 'success'});
             } else {
                 console.log(err.stack);
