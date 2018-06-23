@@ -28,7 +28,11 @@ app.get('/login', (req,res) => {
     res.sendFile('auth.html', { root : __dirname+'/mockfront'})
 });
 
-
+app.get('/profile',
+require('connect-ensure-login').ensureLoggedIn(),
+(req,res) => {
+    res.sendFile('profile.html', { root : __dirname+'/mockfront'});
+});
 
 app.get('/', (req, res) => res.sendFile('index.html', { root : __dirname+'/mockfront'}));
 
@@ -40,7 +44,6 @@ app.get('/m1', function (req,res)
 app.post('/m2', (req,res) => {
     console.log(req.body);
     bcrypt.genSalt(saltRounds, function(err, salt) {
-        console.log(req.body.passeord);
         bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
                 db.addUser(req.body.username,req.body.email,hash);
@@ -55,7 +58,16 @@ app.post('/m2', (req,res) => {
 app.post('/m3',
     auth.passport.authenticate('local'),
     function(req,res){
+        console.log(req);
         res.redirect('/');
+    }
+);
+
+app.post('/m4',
+auth.passport.authenticate('local'),
+    (req,res) => {
+        console.log(req.isAuthenticated());
+        res.json({messagw: "hello"});
     }
 );
 
