@@ -24,17 +24,29 @@ app.use(auth.passport.session());
 
 // app.use(express.static('mockfront'));
 
-app.get('/', (req, res) => res.sendFile('auth.html', { root : __dirname+'/mockfront'}));
+app.get('/login', (req,res) => {
+    res.sendFile('auth.html', { root : __dirname+'/mockfront'})
+});
+
+app.get('/profile',
+require('connect-ensure-login').ensureLoggedIn(),
+(req,res) => {
+    res.sendFile('profile.html', { root : __dirname+'/mockfront'});
+});
+
+app.get('/', (req, res) => res.sendFile('index.html', { root : __dirname+'/mockfront'}));
 
 app.get('/m1', function (req,res)
 { 
     res.send(req.toString());
 });
+
 app.post('/m2', (req,res) => {
+    console.log(req.body);
     bcrypt.genSalt(saltRounds, function(err, salt) {
-        bcrypt.hash('password', salt, function(err, hash) {
+        bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
-                db.addUser('kuan','kuan@exapmle.com',hash);
+                db.addUser(req.body.username,req.body.email,hash);
                 res.json({m2: 'success'});
             } else {
                 console.log(err.stack);
@@ -46,7 +58,16 @@ app.post('/m2', (req,res) => {
 app.post('/m3',
     auth.passport.authenticate('local'),
     function(req,res){
-        res.json({m3: 'success'});
+        console.log(req);
+        res.redirect('/');
+    }
+);
+
+app.post('/m4',
+auth.passport.authenticate('local'),
+    (req,res) => {
+        console.log(req.isAuthenticated());
+        res.json({messagw: "hello"});
     }
 );
 
