@@ -1,47 +1,39 @@
-const passport = require('passport');
-const Strategy = require('passport-local').Strategy;
+const jwt = require('jsonwebtoken');
 const db = require('../db');
 const bcrypt = require('bcrypt');
+const config = require('../config/index');
 
-passport.use(new Strategy(
-    function(username, password, cb) {
-        db.findByUsername(username, function(err,user){
-            if(err) {
-                console.log('err @ strategy');
-                return cb(err);
-            }
-            if(!user) {
-                consoel.log('err @ db find');
-                return cb(null, false)
-            }
+const auth = function(username, password, cb) {
+    db.findByUsername(username,function(user) {
 
-            bcrypt.compare(password,user.password, function(err,res){
-                
-                if(err != undefined) {
-                    console.log('bcrypt err');
-                    return cb(null,false);
+        if(!user) {
+            cb(null, false);
+            return;
+        }
+
+        bcrypt.compare(password, user.password, function(err, res) {
+            if(err != undefined) {
+                console.log('bcrypt err');
+                cb(null,false);
+                return;
+            } else {
+                console.log(res);
+                if(res) {
+                    console.log('bcrypt success');
+                    const payload = {
+                        user: user.username,
+                        email: user.email
+                    };
+                    var token = jwt.sign(payload, config.secrets.secret , {
+                        expiresIn: 86400 // expires in 24 hours
+                    });
+                    cb(null, token); 
                 } else {
-                    if(res) {
-                        console.log('bcrypt success');
-                        return cb(null, user); 
-                    } else {
-                        return cb(null,false);
-                    }
+                    cb(null,false);
                 }
-            });
-        })
-    
-}));
-
-passport.serializeUser(function(user, cb) {
-    cb(null, user.username);
-  });
-  
-  passport.deserializeUser(function(username, cb) {
-    db.findByUsername(username, function (err, user) {
-      if (err) { return cb(err); }
-      cb(null, user);
+            }
+        });
     });
-  });
+}
 
-exports.passport = passport;
+exports.auth = auth;

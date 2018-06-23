@@ -14,12 +14,7 @@ const auth = require('./authentication/auth');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(require('cookie-parser')());
-app.use(require('express-session')({ secret: salt, resave: false, saveUninitialized: false }));
 
-// Initialize Passport and restore authentication state, if any, from the
-// session.
-app.use(auth.passport.initialize());
-app.use(auth.passport.session());
 
 
 // app.use(express.static('mockfront'));
@@ -55,21 +50,28 @@ app.post('/m2', (req,res) => {
     });
 });
 
-app.post('/m3',
-    auth.passport.authenticate('local'),
-    function(req,res){
-        console.log(req);
-        res.redirect('/');
-    }
-);
+app.post('/m3',function(req,res) {
+    auth.auth(req.body.username, req.body.password, function(err,token){
+        if(err) throw err;
+        var message = {}
+        if(token) {
+            message.status = "success";
+            message.token = token;
+        } else {
+            message.status = "fail";
+            message.token = null;
+        }
+        res.json(message);
+    });
+});
 
-app.post('/m4',
-auth.passport.authenticate('local'),
-    (req,res) => {
-        console.log(req.isAuthenticated());
-        res.json({messagw: "hello"});
-    }
-);
+// app.post('/m4',
+// auth.passport.authenticate('local'),
+//     (req,res) => {
+//         console.log(req.isAuthenticated());
+//         res.json({messagw: "hello"});
+//     }
+// );
 
 
 app.listen(8082, () => 

@@ -48,10 +48,9 @@ const pool = new Pool({
         .then(res => {
           const rows = res.rows;
           if(rows.length>0) {
-            cb(null, res.rows[0]);
+            cb(res.rows[0]);
           } else {
-            const noUserError = new Error('Use does not exist!')
-            cb(noUserError,null);
+            cb(null);
           }
         })
         .catch(e => console.log(e.stack));
