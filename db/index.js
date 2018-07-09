@@ -25,14 +25,17 @@ const pool = new Pool({
     });
 
 
-    const addUser = function(user, email, password) {
+    const addUser = function(user, email, password, cb) {
       const query = {
         text: 'INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING *',
         values: [user, email,password]
       };
 
       pool.query(query)
-        .then(res => console.log(res.rows[0]))
+        .then(res => {
+          console.log(res.rows[0]);
+          cb(res.rows[0]);
+        })
         .catch(e => console.error(e.stack));
 
     }

@@ -41,10 +41,13 @@ app.post('/m2', (req,res) => {
     bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
-                db.addUser(req.body.username,req.body.email,hash);
-                res.json({m2: 'success'});
+                db.addUser(req.body.username,req.body.email,hash, function(user){
+                    res.json({m2: 'success'});
+                });
+               
             } else {
                 console.log(err.stack);
+                return res.status(500).send("There was a problem registering the user.");
             }
         });
     });
@@ -65,13 +68,12 @@ app.post('/m3',function(req,res) {
     });
 });
 
-// app.post('/m4',
-// auth.passport.authenticate('local'),
-//     (req,res) => {
-//         console.log(req.isAuthenticated());
-//         res.json({messagw: "hello"});
-//     }
-// );
+app.post('/m4', function(req, res) {
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+    
+}
+);
 
 
 app.listen(8082, () => 

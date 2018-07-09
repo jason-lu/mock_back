@@ -24,7 +24,7 @@ const auth = function(username, password, cb) {
                         user: user.username,
                         email: user.email
                     };
-                    var token = jwt.sign(payload, config.secrets.secret , {
+                    var token = jwt.sign(payload, config.secrets.salt , {
                         expiresIn: 86400 // expires in 24 hours
                     });
                     cb(null, token); 
@@ -33,6 +33,16 @@ const auth = function(username, password, cb) {
                 }
             }
         });
+    });
+}
+
+var authZ = function(token, cb) {
+    jwt.verify(token, config.secrets.salt, function(err,decoded) {
+        if(err) {
+            cb(false, null);
+        } else {
+            cb(true, decoded);
+        }
     });
 }
 
