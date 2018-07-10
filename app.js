@@ -70,7 +70,13 @@ app.post('/m3',function(req,res) {
 
 app.post('/m4', function(req, res) {
     var token = req.headers['x-access-token'];
-    if (!token) return res.status(401).send({ auth: false, message: 'No token provided.' });
+    auth.authZ(token,function(err,decoded){
+        console.log(err);
+        if(!err) {
+            return res.json(decoded);
+        }
+        return res.status(401).send({ auth: false, message: 'No token provided.' });
+    })
     
 }
 );

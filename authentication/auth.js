@@ -37,13 +37,16 @@ const auth = function(username, password, cb) {
 }
 
 var authZ = function(token, cb) {
+    console.log(token);
     jwt.verify(token, config.secrets.salt, function(err,decoded) {
         if(err) {
-            cb(false, null);
+            cb(true, null);
         } else {
-            cb(true, decoded);
+            console.log("ok")
+            cb(false, decoded);
         }
     });
 }
 
 exports.auth = auth;
+exports.authZ = authZ;
