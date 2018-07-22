@@ -13,9 +13,6 @@ var bcrypt = require('bcrypt');
 
 const auth = require('../authentication/auth');
 
-router.get('/login', function(req,res){
-    res.sendFile('auth.html', { root : __dirname+'/mockfront'})
-}) ;
 
 //need authentication for accessing
 router.get('/profile',function(req,res) {
@@ -28,8 +25,6 @@ router.get('/m1', function (req,res)
 });
 
 router.post('/m2', (req,res) => {
-    console.log(req);
-    console.log(req.body);
     bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
@@ -62,7 +57,7 @@ router.post('/m3',function(req,res) {
 
 router.post('/m4', function(req, res) {
     var token = req.headers['x-access-token'];
-    console.log(token);
+
     auth.authZ(token,function(err,decoded){
         console.log(err);
         if(!err) {

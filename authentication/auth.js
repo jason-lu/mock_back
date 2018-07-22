@@ -37,9 +37,10 @@ const auth = function(username, password, cb) {
 }
 
 var authZ = function(token, cb) {
-    console.log(token);
+   // console.log(config.secrets.salt);
     jwt.verify(token, config.secrets.salt, function(err,decoded) {
         if(err) {
+            //console.log(decoded)
             cb(true, null);
         } else {
             console.log("ok")
