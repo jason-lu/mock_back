@@ -3,7 +3,32 @@ const db = require('../db');
 const bcrypt = require('bcrypt');
 const config = require('../config/index');
 
-const auth = function(username, password, cb) {
+const passport = require('passport');
+const passportJWT = require("passport-jwt");
+const ExtractJwt = passportJWT.ExtractJwt;
+const JwtStrategy = passportJWT.Strategy;
+
+var jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
+jwtOptions.secretOrKey = config.secrets.salt;
+
+
+//authorization strategy
+const strategy = new JwtStrategy(jwtOptions, function(payload, next){
+    db.findByUsername(payload.user, function(user){
+        console.log(user);
+        if(!user) {
+            next(false);
+        } else {
+            next(null, payload);
+        }
+    });
+});
+
+passport.use(strategy);
+
+//login
+const login = function(username, password, cb) {
     db.findByUsername(username,function(user) {
 
         if(!user) {
@@ -36,18 +61,6 @@ const auth = function(username, password, cb) {
     });
 }
 
-var authZ = function(token, cb) {
-   // console.log(config.secrets.salt);
-    jwt.verify(token, config.secrets.salt, function(err,decoded) {
-        if(err) {
-            //console.log(decoded)
-            cb(true, null);
-        } else {
-            console.log("ok")
-            cb(false, decoded);
-        }
-    });
-}
+exports.login = login;
+exports.authPass = passport;
 
-exports.auth = auth;
-exports.authZ = authZ;

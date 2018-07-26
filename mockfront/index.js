@@ -41,9 +41,11 @@ var drawCHart = function() {
     var chart = Highcharts.chart('container-rose', options);
 }
 
+load = {
+    message: 'You loaded this page on ' + new Date().toLocaleString()
+};
+
 var app = new Vue({
     el:'#app',
-    data: {
-        message: 'You loaded this page on ' + new Date().toLocaleString()
-    }
+    data: load
 });

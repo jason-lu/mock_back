@@ -10,8 +10,7 @@ const secrets = config.secrets;
 const saltRounds = 10;
 const salt = secrets.salt;
 var bcrypt = require('bcrypt');
-
-const auth = require('../authentication/auth');
+const auth = require('../authentication/authPass');
 
 
 //need authentication for accessing
@@ -25,6 +24,7 @@ router.get('/m1', function (req,res)
 });
 
 router.post('/m2', (req,res) => {
+
     bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(req.body.password, salt, function(err, hash) {
             if(!err) {
@@ -41,7 +41,7 @@ router.post('/m2', (req,res) => {
 });
 
 router.post('/m3',function(req,res) {
-    auth.auth(req.body.username, req.body.password, function(err,token){
+    auth.login(req.body.username, req.body.password, function(err,token){
         if(err) throw err;
         var message = {}
         if(token) {
@@ -55,17 +55,21 @@ router.post('/m3',function(req,res) {
     });
 });
 
-router.post('/m4', function(req, res) {
-    var token = req.headers['x-access-token'];
+// router.post('/m4', function(req, res) {
+//     var token = req.headers['x-access-token'];
 
-    auth.authZ(token,function(err,decoded){
-        console.log(err);
-        if(!err) {
-            return res.json(decoded);
-        }
-        return res.status(401).send({ auth: false, message: 'No token provided.' });
-    })
+//     auth.authZ(token,function(err,decoded){
+//         console.log(err);
+//         if(!err) {
+//             return res.json(decoded);
+//         }
+//         return res.status(401).send({ auth: false, message: 'No token provided.' });
+//     })
     
-});
+// });
+
+router.post("/m4", auth.authPass.authenticate('jwt', { session: false }), function(req, res){
+    res.json({message: "Success! You can not see this without a token"});
+  });
 
 module.exports = router

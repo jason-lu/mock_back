@@ -2,8 +2,6 @@ const { Pool, Client } = require('pg');
 //导入数据库配置信息
 const dbConfig = require('../config/index');
 const secrets = dbConfig.secrets;
-//授权
-const auth = require('../authentication/auth');
 
 
 //连接数据库
@@ -33,7 +31,6 @@ const pool = new Pool({
 
       pool.query(query)
         .then(res => {
-          console.log(res.rows[0]);
           cb(res.rows[0]);
         })
         .catch(e => console.error(e.stack));
